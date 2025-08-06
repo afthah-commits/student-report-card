@@ -1,91 +1,63 @@
 import tkinter as tk
 from tkinter import messagebox
 import matplotlib.pyplot as plt
-import pandas as pd  # NEW: pandas
+import pandas as pd
 
+# --- Setup ---
 window = tk.Tk()
 window.title("Student Report Card Generator")
 window.geometry("300x350")
+filename = "report_cards.csv"
 
-tk.Label(window, text="Student Name:").pack()
-entry_name = tk.Entry(window)
-entry_name.pack()
+# --- Create Label & Entry ---
+def create_entry(label):
+    tk.Label(window, text=label).pack()
+    e = tk.Entry(window)
+    e.pack()
+    return e
 
-tk.Label(window, text="Math Marks:").pack()
-entry_math = tk.Entry(window)
-entry_math.pack()
+entry_name = create_entry("Student Name:")
+entry_math = create_entry("Math Marks:")
+entry_science = create_entry("Science Marks:")
+entry_english = create_entry("English Marks:")
 
-tk.Label(window, text="Science Marks:").pack()
-entry_science = tk.Entry(window)
-entry_science.pack()
-
-tk.Label(window, text="English Marks:").pack()
-entry_english = tk.Entry(window)
-entry_english.pack()
-
-# File path
-filename = "report_cards.csv"  # changed to .csv (pandas works better with CSV)
-
-# Save student data
+# --- Submit Function ---
 def submit():
     name = entry_name.get()
     try:
-        math = int(entry_math.get())
-        science = int(entry_science.get())
-        english = int(entry_english.get())
+        marks = [int(entry_math.get()), int(entry_science.get()), int(entry_english.get())]
     except ValueError:
-        messagebox.showerror("Input Error", "Please enter valid marks (numbers).")
-        return
+        return messagebox.showerror("Input Error", "Enter valid numbers.")
 
-    # Create a DataFrame with one row
-    new_data = pd.DataFrame([[name, math, science, english]], 
-                            columns=["Name", "Math", "Science", "English"])
-
+    data = pd.DataFrame([[name] + marks], columns=["Name", "Math", "Science", "English"])
     try:
-        # If file exists, append without header
-        new_data.to_csv(filename, mode='a', index=False, header=not pd.io.common.file_exists(filename))
+        data.to_csv(filename, mode='a', index=False, header=not pd.io.common.file_exists(filename))
+        messagebox.showinfo("Success", "Data saved!")
     except:
-        messagebox.showerror("Error", "Failed to save data.")
-        return
+        messagebox.showerror("Error", "Could not save data.")
 
-    messagebox.showinfo("Success", "Student data saved successfully!")
-
-
-# Plot analysis using pandas
+# --- Analyze Function ---
 def analyze():
     try:
         df = pd.read_csv(filename)
+        if df.empty: raise ValueError
     except FileNotFoundError:
-        messagebox.showerror("Error", "No data file found.")
-        return
-    except pd.errors.EmptyDataError:
-        messagebox.showinfo("No Data", "The file is empty.")
-        return
+        return messagebox.showerror("Error", "File not found.")
+    except:
+        return messagebox.showinfo("No Data", "No student data to show.")
 
-    if df.empty:
-        messagebox.showinfo("No Data", "No student data to analyze.")
-        return
-
-    names = df["Name"]
-    math = df["Math"]
-    science = df["Science"]
-    english = df["English"]
-
-    # --- BAR CHART (per subject per student) ---
-    x = range(len(names))
+    x = range(len(df))
     plt.figure(figsize=(10, 6))
-    plt.bar([i - 0.2 for i in x], math, width=0.2, label="Math")
-    plt.bar(x, science, width=0.2, label="Science")
-    plt.bar([i + 0.2 for i in x], english, width=0.2, label="English")
-    plt.xticks(x, names)
+    for i, sub in enumerate(["Math", "Science", "English"]):
+        plt.bar([j + (i - 1) * 0.2 for j in x], df[sub], width=0.2, label=sub)
+    plt.xticks(x, df["Name"])
+    plt.title("Student Marks Comparison")
     plt.ylabel("Marks")
-    plt.title("Student Performance Comparison")
     plt.legend()
     plt.tight_layout()
     plt.show()
 
-# --- GUI Buttons ---
-
+# --- Buttons ---
 tk.Button(window, text="Submit", command=submit, bg="lightgreen").pack(pady=10)
 tk.Button(window, text="Analyze & Plot", command=analyze, bg="lightblue").pack(pady=5)
 
