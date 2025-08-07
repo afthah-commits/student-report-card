@@ -1,15 +1,16 @@
+#import libraries
 import tkinter as tk
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# --- Setup ---
+#window Setup
 window = tk.Tk()
 window.title("Student Report Card Generator")
 window.geometry("300x350")
 filename = "report_cards.csv"
 
-# --- Create Label & Entry ---
+#Create Label & Entry
 def create_entry(label):
     tk.Label(window, text=label).pack()
     e = tk.Entry(window)
@@ -21,7 +22,7 @@ entry_math = create_entry("Math Marks:")
 entry_science = create_entry("Science Marks:")
 entry_english = create_entry("English Marks:")
 
-# --- Submit Function ---
+#Submit Function
 def submit():
     name = entry_name.get()
     try:
@@ -36,7 +37,7 @@ def submit():
     except:
         messagebox.showerror("Error", "Could not save data.")
 
-# --- Analyze Function ---
+# Analyze Function
 def analyze():
     try:
         df = pd.read_csv(filename)
@@ -57,7 +58,7 @@ def analyze():
     plt.tight_layout()
     plt.show()
 
-# --- Buttons ---
+#Buttons
 tk.Button(window, text="Submit", command=submit, bg="lightgreen").pack(pady=10)
 tk.Button(window, text="Analyze & Plot", command=analyze, bg="lightblue").pack(pady=5)
 
