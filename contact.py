@@ -14,7 +14,6 @@ def create_connection():
         print("Error connecting to MySQL:", e)
         return None
 
-# Add a new contact
 def add_contact():
     name = input("Name: ")
     phone = input("Phone: ")
@@ -37,7 +36,6 @@ def add_contact():
     finally:
         conn.close()
 
-# View all contacts
 def view_contacts():
     conn = create_connection()
     if not conn:
@@ -56,7 +54,6 @@ def view_contacts():
     finally:
         conn.close()
 
-# Search contacts
 def search_contact():
     keyword = input("Search: ")
     conn = create_connection()
@@ -79,7 +76,6 @@ def search_contact():
     finally:
         conn.close()
 
-# Update a contact
 def update_contact():
     try:
         cid = int(input("ID to update: "))
@@ -104,7 +100,6 @@ def update_contact():
     finally:
         conn.close()
 
-# Delete a contact
 def delete_contact():
     try:
         cid = int(input("ID to delete: "))
@@ -124,7 +119,6 @@ def delete_contact():
     finally:
         conn.close()
 
-# Menu loop
 def main():
     while True:
         print("\n1.Add  2.View  3.Search  4.Update  5.Delete  6.Exit")
@@ -147,4 +141,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
